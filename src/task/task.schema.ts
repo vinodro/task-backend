@@ -7,6 +7,12 @@ export class Task extends Document {
   title: string;
 
   @Prop({ required: true })
+  description: string;
+
+  @Prop({ required: true })
+  completed: Boolean;
+
+  @Prop({ required: true })
   userId: string; // Foreign key to associate tasks with users
 }
 

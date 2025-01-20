@@ -55,9 +55,25 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // // Check if the user is verified
+    // if (!user.isVerified) {
+    //   throw new UnauthorizedException('Account is not verified');
+    // }
     // Check if the user is verified
     if (!user.isVerified) {
-      throw new UnauthorizedException('Account is not verified');
+      // Generate email verification token
+      const verificationToken = this.generateVerificationToken(user.email);
+
+      // Send verification email
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        verificationToken,
+      );
+
+      return {
+        message:
+          'Account is not verified. Please check your email for a verification code.',
+      };
     }
 
     // Check if the password matches
@@ -90,10 +106,9 @@ export class AuthService {
       ) as any;
 
       const user = await this.userService.findById(payload.sub);
-      if (!user || user.refreshToken !== refreshToken) {
+      if (!user) {
         throw new Error('Invalid refresh token');
       }
-
       // Generate a new access token
       const accessToken = this.generateAccessToken(
         user.email,
@@ -107,14 +122,14 @@ export class AuthService {
 
   private generateVerificationToken(email: string): string {
     return jwt.sign({ email }, process.env.JWT_SECRET || 'secret', {
-      expiresIn: '1h',
+      expiresIn: '5m',
     });
   }
 
   private generateAccessToken(email: string, userId: string): string {
     return this.jwtService.sign(
       { email, sub: userId },
-      { secret: process.env.JWT_SECRET || 'secret', expiresIn: '15m' },
+      { secret: process.env.JWT_SECRET || 'secret', expiresIn: '1m' },
     );
   }
 
@@ -123,7 +138,7 @@ export class AuthService {
       { sub: userId },
       process.env.JWT_REFRESH_SECRET || 'secret',
       {
-        expiresIn: '7d',
+        expiresIn: '1d',
       },
     );
   }
