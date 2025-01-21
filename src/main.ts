@@ -10,7 +10,10 @@ async function bootstrap() {
 
   // Enabling CORS
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://yourfrontenddomain.com'], // Allows all domains, you can restrict it to specific domains
+    origin: [
+      'http://localhost:3001',
+      'https://task-frontend-blush.vercel.app/login',
+    ], // Allows all domains, you can restrict it to specific domains
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
   });
